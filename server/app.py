@@ -26,22 +26,50 @@ class Plants(Resource):
         plants_list = [plant.to_dict() for plant in plants]
         return jsonify(plants_list)
 
-    def post(self):
+    # def post(self):
         
-        new_plant = Plant(
-            name=request.form['name'], 
-            image=request.form['image'], 
-            price=request.form['price'],
-            )
-        db.session.add(new_plant)
-        db.session.commit()
-        response_dict = new_plant.to_dict()
-        response = make_response(
-            jsonify(response_dict), 
-            201,
-        )
+    #     new_plant = Plant(
+    #         name=request.form['name'], 
+    #         image=request.form['image'], 
+    #         price=request.form['price'],
+    #         )
+    #     db.session.add(new_plant)
+    #     db.session.commit()
+    #     response_dict = new_plant.to_dict()
+    #     response = make_response(
+    #         jsonify(response_dict), 
+    #         201,
+    #     )
 
-        return response 
+    #     return response 
+
+@app.route('/plants', methods=['POST'])
+def create_plant():
+    data = request.json
+    if not data:
+        return jsonify({"error": "Request body must be in JSON format"}), 400
+
+    name = data.get('name')
+    image = data.get('image')
+    price = data.get('price')
+
+    if not name or not image or not price:
+        return jsonify({"error": "Missing required fields"}), 400
+
+    new_plant = Plant(
+        name=name, 
+        image=image, 
+        price=price,
+    )
+    db.session.add(new_plant)
+    db.session.commit()
+    response_dict = new_plant.to_dict()
+    response = make_response(
+        jsonify(response_dict), 
+        201,
+    )
+    return response 
+
 
 class PlantByID(Resource):
     def get(self, id):
